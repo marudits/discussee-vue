@@ -11,29 +11,8 @@
 		</header>
 		<content class="todo-list__content">
 			<div class="ui cards">
-				<div class="card" v-for="todo in todos">
-					<div class="content">
-						<div class="header">
-							{{ todo.title }}
-						</div>
-						<div class="meta">
-							{{ todo.done ? 'Completed' : 'Pending' }}
-						</div>
-						<div class="description">
-							{{ `${todo.desc.slice(0, 200)}...` }}
-						</div>
-					</div>
-					<div class="extra content">
-						<div class="ui two buttons">
-							 <div class="ui basic green button">
-							 	Approve
-							 </div>
-							 <div class="ui basic red button">
-							 	Decline
-							 </div>
-						</div>
-					</div>
-				</div>
+				<todo-item v-for="(todo, index) in todos" v-bind:todo="todo" v-bind:index="index" :key="todo.id">
+				</todo-item>
 			</div>
 		</content>
 		<footer class="todo-list__footer">
@@ -43,8 +22,13 @@
 </template>
 
 <script type="text/javascript">
+	import TodoItem from './todoItem';
+
 	export default {
 		name: 'TodoList',
+		components: {
+			'todo-item': TodoItem
+		},
 		data() {
 			return {
 				todos: [
