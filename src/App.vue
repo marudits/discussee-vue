@@ -1,12 +1,16 @@
 <template>
   <div id="app" class="app">
       <header class="app-header">
-        <h1>Todo App</h1>
+        <router-link :to="`/`">
+          <h1>Todo App</h1>
+        </router-link>
       </header>
       <content class="app-content">
           <router-view/>
       </content>
-      <footer class="app-footer"></footer>
+      <footer class="app-footer">
+        Copyright &copy; 2018 by marudits
+      </footer>
   </div>
 </template>
 
@@ -24,18 +28,31 @@ export default {
 
   &-header {
       text-align: center;
-      color: #fff;
       background-color: #1ba0e3;
       padding: 12px;
       margin-bottom: 12px;
       
       h1 {
-        text-decoration: underline;
+        color: #fff;
       }
   }
 
   &-content {
     width: 80%;
+  }
+
+  &-footer {
+    text-align: center;
+    background-color: #1ba0e3;
+    padding: 12px;
+    margin-top: 15px;
+    color: #fff;
+
+    /*
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
+    */
   }
 }
 </style>
