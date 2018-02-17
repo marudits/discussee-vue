@@ -30,13 +30,6 @@
 					
 					<form class="ui reply form">
 						<div class="field">
-							<div class="ui left icon input">
-								<input type="text" name="form-name" v-model="form.name" placeholder="Username" autocomplete="off">
-								<i class="user icon"></i>
-							</div>	
-						</div>
-						<div class="message-error" v-if="validation.name.error">{{ validation.name.message }}</div>
-						<div class="field">
 							<textarea name="form-text" v-model="form.text" rows="3"></textarea>
 						</div>
 						<div class="message-error" v-if="validation.text.error">{{ validation.text.message }}</div>
@@ -59,7 +52,7 @@
 	//utils
 	import { getTodos, addComment, getComments } from '../utils/api/todo';
 	import { objectListToArray, calculateDiffTime } from '../utils/helpers/stringManipulation';
-	import fire from '../utils/helpers/firebase';
+	import firebase from 'firebase';
 	
 	export default {
 		name: 'TodoDetail',
@@ -74,14 +67,9 @@
 			return {
 				item: {},
 				form: {
-					name: null,
 					text: null
 				},
 				validation: {
-					name: {
-						error: null,
-						message: null
-					},
 					text: {
 						error: null,
 						message: null
@@ -94,7 +82,7 @@
 	    methods: {
 	    	addComment(){
 	    		if(this.validateForm()){
-	    			addComment(this.item.id, this.form.name, this.form.text);
+	    			addComment(this.item.id, this.form.text);
 	    			this.resetForm();
 	    		}
 	    		
@@ -103,7 +91,7 @@
 	    		return calculateDiffTime(timestamp)
 	    	},
 	    	getComments(){
-	    		let dbComments = fire.firebase_.database().ref('comments')
+	    		let dbComments = firebase.database().ref('comments')
 
 				dbComments.child(this.$route.params.id).on('value', (res) => {
 					if(!res.val()){
@@ -136,17 +124,7 @@
 	    	validateForm(){
 	    		this.resetValidation();
 	    		
-	    		let { name, text } = this.form;
-
-	    		//validate name
-	    		if(!name || name.trim().length <= 0){
-	    			this.validation.name.error = true;
-	    			this.validation.name.message = LABEL.VALIDATION.COMMON.MESSAGE.REQUIRED;
-	    			return false;
-	    		} else {
-	    			this.validation.name.error = null;
-	    			this.validation.name.message = null;
-	    		}
+	    		let { text } = this.form;
 
 	    		//validate text
 	    		if(!text || text.trim().length <= 0){
