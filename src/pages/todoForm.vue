@@ -11,7 +11,7 @@
 
 <script type="text/javascript">
 	//components
-	import TodoForm from '../components/TodoForm';
+	import TodoForm from '../components/todoForm';
 
 	export default {
 		components: {
