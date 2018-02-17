@@ -1,22 +1,50 @@
 <template>
   <div id="app" class="app">
-      <header class="app-header">
-        <router-link :to="`/`">
-          <h1>Todo App</h1>
-        </router-link>
-      </header>
-      <content class="app-content">
-          <router-view/>
-      </content>
-      <footer class="app-footer">
-        Copyright &copy; 2018 by marudits
-      </footer>
+    <header class="app-header">
+      <i class="sign out icon" v-on:click="signOut()"></i>
+      <router-link :to="`/`">
+        <h1>
+          Todo App
+        </h1>
+      </router-link>
+      <h5>{{ username }}</h5>
+    </header>
+    <content class="app-content">
+        <router-view/>
+    </content>
+    <footer class="app-footer">
+      Copyright &copy; 2018 by marudits
+    </footer>
   </div>
 </template>
 
-<script>
+<script type="text/javascript">
+//library
+import firebase from 'firebase';
+
+//utils
+import { getUsernameFromEmail } from './utils/helpers/stringManipulation';
+
 export default {
   name: 'App',
+  created: function(){
+    if(firebase.auth().currentUser){
+      this.username = getUsernameFromEmail(firebase.auth().currentUser.email)
+    }
+  },
+  data: function(){
+    return {
+      username: null
+    }
+  },
+  methods: {
+    signOut(){
+      firebase.auth().signOut()
+        .then(() => {
+          this.$router.replace('/auth');
+        })
+    }
+  }
 }
 </script>
 
@@ -34,6 +62,22 @@ export default {
       
       h1 {
         color: #fff;
+      }
+
+      h5 {
+        margin: 0 auto;
+        color: #fff;
+        font-weight: 300;
+
+      }
+
+      i {
+        font-size: 1.5em;
+        color: #fff;
+        position: fixed;
+        right: 5%;
+        top: 3%;
+        cursor: pointer;
       }
   }
 

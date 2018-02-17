@@ -79,13 +79,13 @@
 	//utils
 	import { removeTodo, setTodoStatus } from '../utils/api/todo';
 	import { objectListToArray } from '../utils/helpers/stringManipulation';
-	import fire from '../utils/helpers/firebase';
+	import firebase from 'firebase';
 
 	export default {
 		name: 'TodoItem',
 		props: ['todo'],
 		created: function(){
-			let dbComments = fire.firebase_.database().ref('comments')
+			let dbComments = firebase.database().ref('comments')
 
 			dbComments.child(this.todo.id).on('value', (res) => {
 				if(!res.val()){
@@ -93,7 +93,7 @@
 				} else {
 					this.comments = objectListToArray(res.val()).length
 				}
-			})
+			});
 		},
 		data: function(){
 			return {
