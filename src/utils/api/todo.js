@@ -1,9 +1,13 @@
-//helpers
-import fire from '../helpers/firebase';
+//utils
+import { getUsernameFromEmail } from '../helpers/stringManipulation';
+
+//library
+import firebase from 'firebase';
+
 
 export function getTodos(id = null) {
 	return new Promise((resolve, reject) => {
-		let dbTodos = fire.firebase_.database().ref('todos' + (id ? `/${id}` : '') )
+		let dbTodos = firebase.database().ref('todos' + (id ? `/${id}` : '') )
 		dbTodos.on('value', (res) => {
 			if(!res.val()){
 				reject(null)
@@ -14,42 +18,50 @@ export function getTodos(id = null) {
 	})	
 }
 
-export function addTodo(title, desc, createdBy = 'Anonymous') {
-	let dbTodos = fire.firebase_.database().ref('todos')
+export function addTodo(title, desc) {
+	const CURRENT_USER = getUsernameFromEmail(firebase.auth().currentUser.email);
+
+	let dbTodos = firebase.database().ref('todos')
 	dbTodos.push({
 		title: title,
 		desc: desc,
 		isEditing: false,
 		isDone: false,
 		createdAt: Date.now(),
-		createdBy: createdBy,
+		createdBy: CURRENT_USER,
 		updatedAt: Date.now(),
-		updatedBy: createdBy
+		updatedBy: CURRENT_USER
 	});
 }
 
 export function removeTodo(id){
-	let dbTodos = fire.firebase_.database().ref('todos').child(id)
+	let dbTodos = firebase.database().ref('todos').child(id)
 	dbTodos.remove();
+	let dbComments = firebase.database().ref('comments').child(id)
+	dbComments.remove();
 }
 
-export function setTodoStatus(id, status, updatedBy = 'Anonymous'){
-	let dbTodos = fire.firebase_.database().ref('todos').child(id)
+export function setTodoStatus(id, status){
+	const CURRENT_USER = getUsernameFromEmail(firebase.auth().currentUser.email);
+
+	let dbTodos = firebase.database().ref('todos').child(id)
 	dbTodos.update({
 		isDone: status,
 		updatedAt: Date.now(),
-		updatedBy: updatedBy
+		updatedBy: CURRENT_USER
 	});
 }
 
-export function updateTodo(id, item, updatedBy = 'Anonymous') {
-	let dbTodos = fire.firebase_.database().ref('todos').child(id)
-	dbTodos.set(Object.assign({}, item, {updatedBy: updatedBy}, {updatedAt: Date.now()}));
+export function updateTodo(id, item) {
+	const CURRENT_USER = getUsernameFromEmail(firebase.auth().currentUser.email);
+
+	let dbTodos = firebase.database().ref('todos').child(id)
+	dbTodos.set(Object.assign({}, item, {updatedBy: CURRENT_USER}, {updatedAt: Date.now()}));
 }
 
 export function getComments(id = null) {
 	return new Promise((resolve, reject) => {
-		let dbComments = fire.firebase_.database().ref('comments')
+		let dbComments = firebase.database().ref('comments')
 
 		dbComments.child(id).on('value', (res) => {
 			if(!res.val()){
@@ -61,11 +73,39 @@ export function getComments(id = null) {
 	})	
 }
 
-export function addComment(id, name, text) {
-	let dbComments = fire.firebase_.database().ref('comments').child(id)
+export function addComment(id, text) {
+	const CURRENT_USER = getUsernameFromEmail(firebase.auth().currentUser.email);
+
+	let dbComments = firebase.database().ref('comments').child(id)
 	dbComments.push({
-		name: name,
+		name: CURRENT_USER,
 		text: text,
 		timestamp: Date.now()
 	});
+}
+
+export function signUp(email, password){
+	return new Promise((resolve, reject) => {
+		firebase.auth().createUserWithEmailAndPassword(email, password)
+			.then((user) => {
+				resolve({ status: true, data: user });
+			}, (err) => {
+				reject({ status: false, data: err })
+			})	
+	})
+}
+
+export function signIn(email, password){
+	return new Promise((resolve, reject) => {
+		firebase.auth().signInWithEmailAndPassword(email, password)
+			.then((user) => {
+				resolve({ status: true, data: user });
+			}, (err) => {
+				reject({ status: false, data: err });
+			})	
+	})
+}
+
+export function getCurrentUser(){
+	return firebase.auth().currentUser
 }

@@ -51,7 +51,7 @@
 	//utils
 	import { addTodos, getTodos } from '../utils/api/todo';
 	import { objectListToArray } from '../utils/helpers/stringManipulation';
-	import fire from '../utils/helpers/firebase';
+	import firebase from 'firebase';
 
 	export default {
 		name: 'TodoList',
@@ -83,7 +83,7 @@
 	    },
 	    methods: {
 	    	getTodos(){
-	    		let dbTodos = fire.firebase_.database().ref('todos')
+	    		let dbTodos = firebase.database().ref('todos')
 				dbTodos.on('value', (res) => {
 					if(!res.val()){
 						this.todos = []

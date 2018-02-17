@@ -14,8 +14,6 @@ export function calculateDiffTime(timestamp = Date.now()){
 	let diffTime = (moment() - moment(new Date(timestamp))),
 		sentTime = new Date(timestamp);
 
-	// console.log('diffTime: ', diffTime, '| sentTime: ', sentTime);
-
 	let countDays =  moment.utc(diffTime).dayOfYear() - 1,
 		countHours = moment.utc(diffTime).hour(),
 		countMinutes = moment.utc(diffTime).minute(),
@@ -34,4 +32,8 @@ export function calculateDiffTime(timestamp = Date.now()){
 			return `${countSeconds}s ago`;
 		}
     }
+}
+
+export function getUsernameFromEmail(email){
+	return email.slice(0, email.indexOf('@'))
 }

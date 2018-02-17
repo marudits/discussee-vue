@@ -13,29 +13,35 @@
 					<h4 class="ui dividing header">{{comments.length}} Comments</h4>
 					<div class="comments-list" id="comments-list">
 						<div class="comment comments-item" v-for="item in comments" :id="`comment-${item.id}`">
-							<a class="avatar">
-								<i class="user icon big"></i>
-						    </a>
-						    <div class="content">
-						    	<a class="author">{{ item.name }}</a>
-						    	<div class="metadata">
-						    		<span class="date">{{ formatTime(item.timestamp)}}</span>
-						    	</div>
-						    	<div class="text">
-						    		{{ item.text }}
-						    	</div>
-						    </div>
+							<div v-if="!isOwnComment(item.name)" class="comments-item__other">
+								<a class="item-avatar">
+									<i class="user teal icon big"></i>
+							    </a>
+							    <div class="item-content">
+							    	<a class="author">{{ item.name }}</a>
+							    	<div class="text ui teal label">
+							    		{{ item.text }}
+							    	</div>
+							    	<div class="timestamp">
+							    		{{ formatTime(item.timestamp)}}
+							    	</div>
+							    </div>	
+							</div>
+							<div v-if="isOwnComment(item.name)" class="comments-item__own">
+								
+							    <div class="item-content">
+							    	<div class="text ui blue label">
+							    		{{ item.text }}
+							    	</div>
+							    	<div class="timestamp">
+							    		{{ formatTime(item.timestamp)}}
+							    	</div>
+							    </div>
+							</div>
 						</div>	
 					</div>
 					
 					<form class="ui reply form">
-						<div class="field">
-							<div class="ui left icon input">
-								<input type="text" name="form-name" v-model="form.name" placeholder="Username" autocomplete="off">
-								<i class="user icon"></i>
-							</div>	
-						</div>
-						<div class="message-error" v-if="validation.name.error">{{ validation.name.message }}</div>
 						<div class="field">
 							<textarea name="form-text" v-model="form.text" rows="3"></textarea>
 						</div>
@@ -58,8 +64,8 @@
 
 	//utils
 	import { getTodos, addComment, getComments } from '../utils/api/todo';
-	import { objectListToArray, calculateDiffTime } from '../utils/helpers/stringManipulation';
-	import fire from '../utils/helpers/firebase';
+	import { objectListToArray, calculateDiffTime, getUsernameFromEmail } from '../utils/helpers/stringManipulation';
+	import firebase from 'firebase';
 	
 	export default {
 		name: 'TodoDetail',
@@ -74,14 +80,9 @@
 			return {
 				item: {},
 				form: {
-					name: null,
 					text: null
 				},
 				validation: {
-					name: {
-						error: null,
-						message: null
-					},
 					text: {
 						error: null,
 						message: null
@@ -94,7 +95,7 @@
 	    methods: {
 	    	addComment(){
 	    		if(this.validateForm()){
-	    			addComment(this.item.id, this.form.name, this.form.text);
+	    			addComment(this.item.id, this.form.text);
 	    			this.resetForm();
 	    		}
 	    		
@@ -103,7 +104,7 @@
 	    		return calculateDiffTime(timestamp)
 	    	},
 	    	getComments(){
-	    		let dbComments = fire.firebase_.database().ref('comments')
+	    		let dbComments = firebase.database().ref('comments')
 
 				dbComments.child(this.$route.params.id).on('value', (res) => {
 					if(!res.val()){
@@ -118,6 +119,9 @@
 	    		getTodos(this.$route.params.id).then((res) => {
 					this.item = Object.assign(res, {key: this.$route.params.id}, {id: this.$route.params.id});
 				});
+	    	},
+	    	isOwnComment(name){
+	    		return name === getUsernameFromEmail(firebase.auth().currentUser.email)
 	    	},
 	    	resetForm(){
 				for(let key in this.form){
@@ -136,17 +140,7 @@
 	    	validateForm(){
 	    		this.resetValidation();
 	    		
-	    		let { name, text } = this.form;
-
-	    		//validate name
-	    		if(!name || name.trim().length <= 0){
-	    			this.validation.name.error = true;
-	    			this.validation.name.message = LABEL.VALIDATION.COMMON.MESSAGE.REQUIRED;
-	    			return false;
-	    		} else {
-	    			this.validation.name.error = null;
-	    			this.validation.name.message = null;
-	    		}
+	    		let { text } = this.form;
 
 	    		//validate text
 	    		if(!text || text.trim().length <= 0){
@@ -197,6 +191,74 @@
 
 				&-item {
 
+					&__other {
+						display: inline-flex;
+						margin-right: 10%;
+						float: left;
+						width: 100%;
+						margin-bottom: 15px;
+
+						.item {
+							&-avatar {
+								width: 15%;
+								text-align: center;
+								padding-top: 18px;
+							}
+
+							&-content {
+								margin-right: 40%;
+								width: 100%;
+
+								.author {
+									display: block;
+								}
+
+								.text {
+									text-align: left;
+									font-weight: 300;
+									padding: 5px 10px;
+									border-radius: 2px 10px 10px 2px;
+								}
+
+								.timestamp {
+									font-size: 0.8em;
+									color: grey;
+								}
+							}	
+						}
+						
+					}
+					
+
+					&__own {
+						display: inline-flex;
+						margin-right: 4%;
+						float: right;
+						width: 100%;
+						margin-bottom: 15px;
+
+						.item {
+							&-content {
+								margin-left: 40%;
+								width: 100%;
+
+								.text {
+									text-align: right;
+									font-weight: 300;
+									padding: 5px 10px;
+									border-radius: 10px 2px 2px 10px;
+								}
+
+								.timestamp {
+									font-size: 0.8em;
+									color: grey;
+								}	text-align: right;
+							}
+						}
+
+						
+						
+					}
 				}
 			}
 
