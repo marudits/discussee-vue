@@ -10,9 +10,9 @@
 				<router-link :to="`/detail/${todo.id}`">{{ todo.title }}</router-link>
 			</div>
 			<div class="meta">
-				<i class="green check circle icon medium" v-show="todo.isDone"></i>
-				<i class="red remove circle icon medium" v-show="!todo.isDone"></i>
-				{{ todo.isDone ? 'Completed' : 'Pending' }}
+				<i class="red lock icon" v-show="todo.isDone"></i>
+				<i class="green unlock icon" v-show="!todo.isDone"></i>
+				{{ todo.isDone ? 'Closed' : 'Opened' }}
 			</div>
 			<div class="description">
 				{{ `${todo.desc.slice(0, 200)}...` }}
@@ -39,16 +39,16 @@
 
 		<div class="extra content todo-item__actions" v-show="!todo.isEditing">
 			<div class="ui labeled button" tabindex="0" v-show="!todo.isDone">
-				<div class="ui vertical animated green  button" v-on:click="toggleStatus()">
+				<div class="ui vertical animated red basic button" v-on:click="toggleStatus()">
 					<div class="visible content">
-						Mark as Completed
+						Mark as Closed
 					</div>
 					<div class="hidden content">
-						<i class="check circle icon"></i>
+						<i class="lock icon"></i>
 					</div>
 				</div>
-				<a href="#" class="ui basic green left pointing label">
-					<router-link :to="`/detail/${todo.id}`" class="ui green">
+				<a href="#" class="ui basic red left pointing label">
+					<router-link :to="`/detail/${todo.id}`" class="ui red">
 						<i class="comments icon"></i>
 						{{ comments }}
 					</router-link>
@@ -56,16 +56,16 @@
 			</div>
 			
 			<div class="ui labeled button" tabindex="0" v-show="todo.isDone">
-				<div class="ui vertical animated red basic button" v-on:click="toggleStatus()">
+				<div class="ui vertical animated green button" v-on:click="toggleStatus()">
 					<div class="visible content">
-						Mark as Pending
+						Mark as Opened
 					</div>
 					<div class="hidden content">
-						<i class="remove circle icon"></i>
+						<i class="unlock icon"></i>
 					</div>
 				</div>
-				<a href="#" class="ui basic red left pointing label">
-					<router-link :to="`/detail/${todo.id}`" class="ui red">
+				<a href="#" class="ui basic green left pointing label">
+					<router-link :to="`/detail/${todo.id}`" class="ui green">
 						<i class="comments icon"></i>
 						{{ comments }}
 					</router-link>

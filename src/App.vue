@@ -1,10 +1,10 @@
 <template>
   <div id="app" class="app">
     <header class="app-header">
-      <i class="sign out icon" v-on:click="signOut()"></i>
+      <i class="power icon" v-on:click="signOut()"></i>
       <router-link :to="`/`">
         <h1>
-          Todo App
+          <i class="comments icon"></i>Discussee
         </h1>
       </router-link>
       <h5>{{ username }}</h5>
@@ -62,13 +62,20 @@ export default {
       
       h1 {
         color: #fff;
+
+        i {
+          position: relative;
+          right: 0;
+          top: 0;
+          font-size: 1.3em;
+        }
       }
 
       h5 {
         margin: 0 auto;
         color: #fff;
         font-weight: 300;
-
+        font-style: italic;
       }
 
       i {

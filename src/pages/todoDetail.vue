@@ -1,7 +1,7 @@
 <template>
 	<section class="todo-detail">
 		<header>
-			<h3>Item Detail</h3>
+			<h3>Thread Detail</h3>
 		</header>
 		<content>
 			<section class="todo-detail__info">

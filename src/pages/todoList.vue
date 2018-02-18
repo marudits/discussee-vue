@@ -2,7 +2,7 @@
 	<section class="todo-list">
 		<header class="todo-list__header">
 			<h2>
-				Todo List
+				Thread List
 				<router-link :to="`/add`">
 					<i class="green add circle icon"></i>
 				</router-link>
@@ -13,19 +13,19 @@
 						<i class="list layout icon"></i> {{ todos.length }}
 					</span>
 					<span class="ui green label">
-						<i class="check circle icon"></i> {{ todos.filter(x => { return x.isDone === true }).length }}
+						<i class="unlock icon"></i> {{ todos.filter(x => { return x.isDone === false}).length }}
 					</span>
 					<span class="ui red label">
-						<i class="remove circle icon"></i> {{ todos.filter(x => { return x.isDone === false}).length }}
+						<i class="lock icon"></i> {{ todos.filter(x => { return x.isDone === true }).length }}
 					</span>
 				</div>
-				<div class="list-summary__progress">
+				<!-- <div class="list-summary__progress">
 					<div class="ui active progress" id="list-progress">
 						<div class="bar">
 							<div class="progress"></div>
 						</div>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</header>
 		<content class="todo-list__content">
