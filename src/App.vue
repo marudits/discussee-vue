@@ -1,18 +1,30 @@
 <template>
   <div id="app" class="app">
-    <header class="app-header">
-      <i class="sign out icon" v-on:click="signOut()"></i>
-      <router-link :to="`/`">
-        <h1>
-          Todo App
-        </h1>
-      </router-link>
-      <h5>{{ username }}</h5>
+    <header class="ui fixed menu app-header">
+      <div class="ui container">
+        <router-link :to="`/`">
+          <h1>
+            <i class="comments icon"></i>Discussee
+          </h1>
+        </router-link>
+
+        <div class="ui right floated simple dropdown item" v-if="isAuthenticated()">
+          <span>
+            {{ username }}
+          </span>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <a class="item" href="#" v-on:click="signOut()">
+              Sign Out
+            </a>
+          </div>
+        </div>
+      </div>
     </header>
-    <content class="app-content">
+    <content class="ui main container app-content">
         <router-view/>
     </content>
-    <footer class="app-footer">
+    <footer class="ui footer segment app-footer">
       Copyright &copy; 2018 by marudits
     </footer>
   </div>
@@ -34,10 +46,16 @@ export default {
   },
   data: function(){
     return {
-      username: null
+      username: this.getUsername()
     }
   },
   methods: {
+    getUsername(){
+      return firebase.auth().currentUser ? getUsernameFromEmail(firebase.auth().currentUser.email) : ''
+    },
+    isAuthenticated(){
+      return firebase.auth().currentUser
+    },
     signOut(){
       firebase.auth().signOut()
         .then(() => {
@@ -56,47 +74,42 @@ export default {
 
   &-header {
       text-align: center;
-      background-color: #1ba0e3;
+      background-color: #35bdb3 !important;
       padding: 12px;
       margin-bottom: 12px;
       
       h1 {
         color: #fff;
-      }
 
-      h5 {
-        margin: 0 auto;
-        color: #fff;
-        font-weight: 300;
-
+        i {
+          font-size: 1.3em;
+        }
       }
 
       i {
-        font-size: 1.5em;
         color: #fff;
-        position: fixed;
-        right: 5%;
-        top: 3%;
         cursor: pointer;
+      }
+
+      .dropdown {
+        span {
+          color: #fff;
+        }
       }
   }
 
   &-content {
-    width: 80%;
+    margin-top: 5em;
   }
 
   &-footer {
     text-align: center;
-    background-color: #1ba0e3;
-    padding: 12px;
-    margin-top: 15px;
+    background-color: #35bdb3 !important;
     color: #fff;
-
-    /*
-    position: fixed;
+    border-radius: 0px !important;
+    position: fixed !important;
+    bottom: 0;
     width: 100%;
-    bottom: 0px;
-    */
   }
 }
 </style>

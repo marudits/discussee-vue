@@ -2,7 +2,8 @@
 	<section class="auth">
 		<header class="auth-header">
 			<h3>Welcome</h3>
-			<p>Please sign in to continue</p>
+			<p v-if="mode === 'SIGN_IN'">Please sign in to continue</p>
+			<p v-if="mode === 'SIGN_UP'">Create account and enjoy the app</p>
 		</header>
 		<content class="auth-content">
 			<div :class="`ui ${isLoading} form`">
@@ -25,7 +26,7 @@
 					{{ validation.password.message }}
 				</div>
 				<div class="ui field">
-					<div class="ui submit button" v-on:click="handleSubmit()">
+					<div :class="`ui submit ${mode === 'SIGN_IN' ? 'blue' : 'green'} button`" v-on:click="handleSubmit()">
 						{{ mode === 'SIGN_IN' ? 'Sign In' : 'Sign Up'}}
 					</div>	
 				</div>
