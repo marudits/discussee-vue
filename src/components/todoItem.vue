@@ -10,12 +10,15 @@
 				<router-link :to="`/detail/${todo.id}`">{{ todo.title }}</router-link>
 			</div>
 			<div class="meta">
-				<i class="green check circle icon medium" v-show="todo.isDone"></i>
-				<i class="red remove circle icon medium" v-show="!todo.isDone"></i>
-				{{ todo.isDone ? 'Completed' : 'Pending' }}
+				<i class="red lock icon" v-show="todo.isDone"></i>
+				<i class="green unlock icon" v-show="!todo.isDone"></i>
+				{{ todo.isDone ? 'Closed' : 'Opened' }}
 			</div>
 			<div class="description">
 				{{ `${todo.desc.slice(0, 200)}...` }}
+			</div>
+			<div class="info">
+				Created by <span class="info-meta__user">{{todo.createdBy}}</span> at <span class="info-meta__date">{{ this.calculateDiffTime(todo.createdAt) }}</span>
 			</div>
 		</div>
 		<!-- Form Todo Item -->
@@ -30,7 +33,7 @@
 					<textarea name="todo-desc" v-model="todo.desc"></textarea>
 				</div>
 				<div class="ui two button attached buttons">
-					<button class="ui basic grey button" v-on:click="toggleIsEditing()">
+					<button class="ui basic grey button" v-on:click="editItem()">
 						Finish Editing
 					</button>
 				</div>
@@ -39,46 +42,46 @@
 
 		<div class="extra content todo-item__actions" v-show="!todo.isEditing">
 			<div class="ui labeled button" tabindex="0" v-show="!todo.isDone">
-				<div class="ui vertical animated green  button" v-on:click="toggleStatus()">
+				<div class="ui vertical animated red basic button" v-on:click="toggleStatus()">
 					<div class="visible content">
-						Mark as Completed
+						Mark as Closed
 					</div>
 					<div class="hidden content">
-						<i class="check circle icon"></i>
+						<i class="lock icon"></i>
 					</div>
 				</div>
-				<a :href="`/#/detail/${todo.id}`" class="ui basic green left pointing label">
-					<i class="comments icon">
-					</i>
-					{{ comments }}
+				<a href="#" class="ui basic red left pointing label">
+					<router-link :to="`/detail/${todo.id}`" class="ui red">
+						<i class="comments icon"></i>
+						{{ comments }}
+					</router-link>
 				</a>	
 			</div>
 			
 			<div class="ui labeled button" tabindex="0" v-show="todo.isDone">
-				<div class="ui vertical animated red basic button" v-on:click="toggleStatus()">
+				<div class="ui vertical animated green button" v-on:click="toggleStatus()">
 					<div class="visible content">
-						Mark as Pending
+						Mark as Opened
 					</div>
 					<div class="hidden content">
-						<i class="remove circle icon"></i>
+						<i class="unlock icon"></i>
 					</div>
 				</div>
-				<a :href="`/#/detail/${todo.id}`" class="ui basic red left pointing label">
-					<i class="comments icon">
-					</i>
-					{{ comments }}
+				<a href="#" class="ui basic green left pointing label">
+					<router-link :to="`/detail/${todo.id}`" class="ui green">
+						<i class="comments icon"></i>
+						{{ comments }}
+					</router-link>
 				</a>	
 			</div>
 		</div>
-
-		
 	</div>
 </template>
 
 <script type="text/javascript">
 	//utils
-	import { removeTodo, setTodoStatus } from '../utils/api/todo';
-	import { objectListToArray } from '../utils/helpers/stringManipulation';
+	import { removeTodo, setTodoStatus, updateTodo } from '../utils/api/todo';
+	import { calculateDiffTime, objectListToArray } from '../utils/helpers/stringManipulation';
 	import firebase from 'firebase';
 
 	export default {
@@ -101,6 +104,19 @@
 			}
 		},
 		methods: {
+			calculateDiffTime(time){
+				return calculateDiffTime(time)
+			},
+			editItem(){
+				let item = this.todo,
+					{ key } = item;
+
+				delete item.key;
+				delete item.id;
+
+				updateTodo(key, Object.assign({}, item, {isEditing: false}));
+				this.toggleIsEditing();
+			},
 			toggleIsEditing(){
 				this.todo.isEditing = !this.todo.isEditing;
 			},
@@ -126,11 +142,29 @@
 
 			.header {
 				text-decoration: underline;
+				font-size: 1.3em !important;
 			}
 
 			.description {
 				text-align: justify;
 				text-indent: 1.8em;
+			}
+
+			.info {
+				margin-top: 9px;
+				padding-top: 6px;
+				font-size: 0.8em;
+				border-top: 1px dashed #f0f0f0;
+
+				&-meta {
+					&__user {
+						font-weight: 500;
+					}
+
+					&__date {
+						font-style: italic;
+					}
+				}
 			}
 		}
 
