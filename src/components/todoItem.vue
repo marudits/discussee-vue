@@ -47,10 +47,11 @@
 						<i class="check circle icon"></i>
 					</div>
 				</div>
-				<a :href="`/#/detail/${todo.id}`" class="ui basic green left pointing label">
-					<i class="comments icon">
-					</i>
-					{{ comments }}
+				<a href="#" class="ui basic green left pointing label">
+					<router-link :to="`/detail/${todo.id}`" class="ui green">
+						<i class="comments icon"></i>
+						{{ comments }}
+					</router-link>
 				</a>	
 			</div>
 			
@@ -63,10 +64,11 @@
 						<i class="remove circle icon"></i>
 					</div>
 				</div>
-				<a :href="`/#/detail/${todo.id}`" class="ui basic red left pointing label">
-					<i class="comments icon">
-					</i>
-					{{ comments }}
+				<a href="#" class="ui basic red left pointing label">
+					<router-link :to="`/detail/${todo.id}`" class="ui red">
+						<i class="comments icon"></i>
+						{{ comments }}
+					</router-link>
 				</a>	
 			</div>
 		</div>
