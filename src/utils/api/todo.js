@@ -85,6 +85,22 @@ export function addComment(id, text) {
 	});
 }
 
+export function isTypingComment(id, text){
+	const CURRENT_USER = getCurrentUsername();
+
+	let dbIsTyping = firebase.database().ref('isTyping').child(id).child(CURRENT_USER);
+	dbIsTyping.set({
+		text: text
+	});
+}
+
+export function isFinishedTypingComment(id){
+	const CURRENT_USER = getCurrentUsername();
+
+	let dbIsTyping = firebase.database().ref('isTyping').child(id).child(CURRENT_USER);
+	dbIsTyping.remove();
+}
+
 export function signUp(email, password){
 	return new Promise((resolve, reject) => {
 		firebase.auth().createUserWithEmailAndPassword(email, password)

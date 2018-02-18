@@ -43,8 +43,10 @@
 							    </div>
 							</div>
 						</div>
+						<div class="comments-item__istyping" v-if="isTyping.count > 0">
+							<p>{{ formatIsTypingInfo() }}</p>
+						</div>
 					</div>
-
 
 					<div class="ui horizontal divider comments-locked" v-if="item.isDone">
 						Creator has closed this thread
@@ -52,7 +54,7 @@
 					
 					<form class="ui reply form" v-if="!item.isDone">
 						<div class="field">
-							<textarea name="form-text" v-model="form.text" rows="3"></textarea>
+							<textarea name="form-text" v-model="form.text" rows="3" v-on:keyup="handleComment()"></textarea>
 						</div>
 						<div class="message-error" v-if="validation.text.error">{{ validation.text.message }}</div>
 					    <div class="ui blue labeled submit icon button" v-on:click="addComment()">
@@ -72,7 +74,7 @@
 	import { LABEL } from '../assets/label';
 
 	//utils
-	import { getTodos, addComment, getComments } from '../utils/api/todo';
+	import { getTodos, addComment, getComments, getCurrentUsername, isTypingComment, isFinishedTypingComment } from '../utils/api/todo';
 	import { objectListToArray, calculateDiffTime, getUsernameFromEmail } from '../utils/helpers/stringManipulation';
 	import firebase from 'firebase';
 	
@@ -84,6 +86,9 @@
 
 			//get item comments
 			this.getComments();
+
+			//get isTyping items
+			this.getIsTyping();
 		},
 		data: function() {
 			return {
@@ -97,7 +102,13 @@
 						message: null
 					}
 				},
-				comments: []
+				comments: [],
+				isTyping: {
+					timer: null,
+					list: null,
+					count: null
+				},
+
 			}
 			
 	    },
@@ -106,6 +117,22 @@
 	    		if(this.validateForm()){
 	    			addComment(this.item.id, this.form.text);
 	    			this.resetForm();
+	    		}
+	    		
+	    	},
+	    	formatIsTypingInfo(){
+	    		let isCurrentUserTyping = this.isTyping.list.filter(x => (x.key === getCurrentUsername())).length === 1,
+	    			otherUserTyping = this.isTyping.list.filter(x => (x.key !== getCurrentUsername())),
+	    			totalIsTyping = this.isTyping.list.length;
+
+	    		if(this.isTyping.list.length === 1){
+	    			return `${isCurrentUserTyping ? 'You are' : this.isTyping.list[0].id + ' is'} typing...`
+	    		} else {
+	    			if(isCurrentUserTyping){
+	    				return `You and ${otherUserTyping.length > 1 ? otherUserTyping.length + ' people' : otherUserTyping[0].id} are typing...`
+	    			} else {
+	    				return `${otherUserTyping[0].id} and ${otherUserTyping.length > 2 ? otherUserTyping.length + ' people' : otherUserTyping[1].id} are typing...`
+	    			}
 	    		}
 	    		
 	    	},
@@ -124,10 +151,32 @@
 					}
 				});
 	    	},
+	    	getIsTyping(){
+	    		let dbIsTyping = firebase.database().ref('isTyping').child(this.$route.params.id)
+
+				dbIsTyping.on('value', (res) => {
+					if(!res.val()){
+						this.isTyping.list = [];
+						this.isTyping.count = 0;
+					} else {
+						this.isTyping.list = objectListToArray(res.val());
+						this.isTyping.count = Object.keys(res.val()).length
+					}
+				});
+	    	},
 	    	getTodos(){
 	    		getTodos(this.$route.params.id).then((res) => {
 					this.item = Object.assign(res, {key: this.$route.params.id}, {id: this.$route.params.id});
 				});
+	    	},
+	    	handleComment(){
+	    		let { text } = this.form;
+
+	    		if(text){
+	    			this.resetIsTypingTimer(this.item.id);
+
+	    			isTypingComment(this.item.id, text)
+	    		}
 	    	},
 	    	isOwnComment(name){
 	    		return name === getUsernameFromEmail(firebase.auth().currentUser.email)
@@ -137,6 +186,17 @@
 					this.form[key] = null
 				}
 	    	},
+	    	resetIsTypingTimer(id){
+	    		if(this.isTyping.timer){
+	    			clearTimeout(this.isTyping.timer);
+	    			this.isTyping.timer = null
+	    		}
+
+	    		let that = this;
+	    		this.isTyping.timer = setTimeout(function(){
+	    			that.stoppedTyping(id)
+	    		}, 5000)
+	    	},
 	    	resetValidation(){
 	    		for(let key in this.validation){
 					this.validation[key].error = null
@@ -145,6 +205,12 @@
 	    	},
 	    	scrollComments(){
 	    		$('#comments-list').animate({scrollTop: $('#comments-list').prop("scrollHeight")}, 500);
+	    	},
+	    	stoppedTyping(id){
+	    		if(this.isTyping.timer){
+	    			this.isTyping.timer = null;
+	    			isFinishedTypingComment(id);
+	    		}
 	    	},
 	    	validateForm(){
 	    		this.resetValidation();
