@@ -1,10 +1,14 @@
 <template>
 	<section class="todo-detail">
 		<header>
-			<h3>Thread Detail</h3>
+			<h2>Thread Detail</h2>
 		</header>
 		<content>
 			<section class="todo-detail__info">
+				<div class="info-meta">
+					<p>Created by <span class="info-meta__user">{{item.createdBy}}</span> at <span class="info-meta__date">{{ this.formatTime(item.createdAt) }}</span></p>
+					<p>Last Updated <span class="info-meta__date">{{ this.formatTime(item.updatedAt) }}</span></p>
+				</div>
 				<h4>{{ item.title }}</h4>
 				<p>{{ item.desc }}</p>
 			</section>
@@ -38,10 +42,15 @@
 							    	</div>
 							    </div>
 							</div>
-						</div>	
+						</div>
+					</div>
+
+
+					<div class="ui horizontal divider comments-locked" v-if="item.isDone">
+						Creator has closed this thread
 					</div>
 					
-					<form class="ui reply form">
+					<form class="ui reply form" v-if="!item.isDone">
 						<div class="field">
 							<textarea name="form-text" v-model="form.text" rows="3"></textarea>
 						</div>
@@ -169,10 +178,32 @@
 		}
 
 		&__info {
-			margin: 1.5em 0em;;
+			margin: 1.5em 0em;
+
+			.info {
+
+				&-meta {
+					font-size: 0.8em;
+
+					p {
+						text-indent: 0;
+						margin-bottom: 3px;
+					}
+
+					&__user {
+						font-weight: 500;
+					}
+
+					&__date {
+						font-style: italic;
+					}
+				}
+			}
 
 			h4 {
 				text-decoration: underline;
+				margin-top: 1em;
+				font-size: 1.3em !important;
 			}
 
 			p {
@@ -259,6 +290,11 @@
 						
 						
 					}
+				}
+
+				&-locked {
+					font-size: 0.5em;
+					text-transform: normal;
 				}
 			}
 
