@@ -1,7 +1,7 @@
 <template>
 	<section class="todo-form">
 		<header>
-			<h3>Form</h3>
+			<h2>Thread Form</h2>
 		</header>
 		<content>
 			<todo-form v-bind:todo="todo" v-bind:mode="mode"></todo-form>

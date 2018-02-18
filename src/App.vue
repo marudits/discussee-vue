@@ -110,6 +110,7 @@ export default {
     position: fixed !important;
     bottom: 0;
     width: 100%;
+    z-index: 99;
   }
 }
 </style>

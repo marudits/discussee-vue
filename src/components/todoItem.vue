@@ -1,7 +1,7 @@
 <template>
 	<div class="card todo-item">
 		<div class="content todo-item__content" v-show="!todo.isEditing">
-			<span class="item-action">
+			<span class="item-action" v-if="isThreadCreator()">
 				<i class="right floated basic red trash icon" v-on:click="removeItem()"></i>
 				<i class="right floated basic yellow edit icon" v-on:click="toggleIsEditing()"></i>	
 			</span>
@@ -72,7 +72,7 @@
 						<i class="comments icon"></i>
 						{{ comments }}
 					</router-link>
-				</a>	
+				</a>
 			</div>
 		</div>
 	</div>
@@ -80,7 +80,7 @@
 
 <script type="text/javascript">
 	//utils
-	import { removeTodo, setTodoStatus, updateTodo } from '../utils/api/todo';
+	import { getCurrentUsername, removeTodo, setTodoStatus, updateTodo } from '../utils/api/todo';
 	import { calculateDiffTime, objectListToArray } from '../utils/helpers/stringManipulation';
 	import firebase from 'firebase';
 
@@ -117,12 +117,17 @@
 				updateTodo(key, Object.assign({}, item, {isEditing: false}));
 				this.toggleIsEditing();
 			},
+			isThreadCreator(){
+				return this.todo.createdBy === getCurrentUsername()
+			},
 			toggleIsEditing(){
 				this.todo.isEditing = !this.todo.isEditing;
 			},
 			toggleStatus(){
-				this.todo.isDone = !this.todo.isDone;
-				setTodoStatus(this.todo.id, this.todo.isDone)
+				if(this.isThreadCreator()){
+					this.todo.isDone = !this.todo.isDone;
+					setTodoStatus(this.todo.id, this.todo.isDone)
+				}
 			},
 			removeItem(){
 				removeTodo(this.todo.id)

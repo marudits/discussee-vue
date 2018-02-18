@@ -110,3 +110,7 @@ export function signIn(email, password){
 export function getCurrentUser(){
 	return firebase.auth().currentUser
 }
+
+export function getCurrentUsername(){
+	return getUsernameFromEmail(firebase.auth().currentUser.email)
+}
