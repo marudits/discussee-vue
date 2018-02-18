@@ -17,6 +17,9 @@
 			<div class="description">
 				{{ `${todo.desc.slice(0, 200)}...` }}
 			</div>
+			<div class="info">
+				Created by <span class="info-meta__user">{{todo.createdBy}}</span> at <span class="info-meta__date">{{ this.calculateDiffTime(todo.createdAt) }}</span>
+			</div>
 		</div>
 		<!-- Form Todo Item -->
 		<div class="content" v-show="todo.isEditing">
@@ -30,7 +33,7 @@
 					<textarea name="todo-desc" v-model="todo.desc"></textarea>
 				</div>
 				<div class="ui two button attached buttons">
-					<button class="ui basic grey button" v-on:click="toggleIsEditing()">
+					<button class="ui basic grey button" v-on:click="editItem()">
 						Finish Editing
 					</button>
 				</div>
@@ -72,15 +75,13 @@
 				</a>	
 			</div>
 		</div>
-
-		
 	</div>
 </template>
 
 <script type="text/javascript">
 	//utils
-	import { removeTodo, setTodoStatus } from '../utils/api/todo';
-	import { objectListToArray } from '../utils/helpers/stringManipulation';
+	import { removeTodo, setTodoStatus, updateTodo } from '../utils/api/todo';
+	import { calculateDiffTime, objectListToArray } from '../utils/helpers/stringManipulation';
 	import firebase from 'firebase';
 
 	export default {
@@ -103,6 +104,19 @@
 			}
 		},
 		methods: {
+			calculateDiffTime(time){
+				return calculateDiffTime(time)
+			},
+			editItem(){
+				let item = this.todo,
+					{ key } = item;
+
+				delete item.key;
+				delete item.id;
+
+				updateTodo(key, Object.assign({}, item, {isEditing: false}));
+				this.toggleIsEditing();
+			},
 			toggleIsEditing(){
 				this.todo.isEditing = !this.todo.isEditing;
 			},
@@ -128,11 +142,29 @@
 
 			.header {
 				text-decoration: underline;
+				font-size: 1.3em !important;
 			}
 
 			.description {
 				text-align: justify;
 				text-indent: 1.8em;
+			}
+
+			.info {
+				margin-top: 9px;
+				padding-top: 6px;
+				font-size: 0.8em;
+				border-top: 1px dashed #f0f0f0;
+
+				&-meta {
+					&__user {
+						font-weight: 500;
+					}
+
+					&__date {
+						font-style: italic;
+					}
+				}
 			}
 		}
 

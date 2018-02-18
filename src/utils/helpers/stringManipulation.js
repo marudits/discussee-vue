@@ -22,7 +22,7 @@ export function calculateDiffTime(timestamp = Date.now()){
 	if(countDays > 1){
 		return moment(sentTime).format('D/MM/YY').toString();
 	} else if(countDays === 1){
-		return 'Yesterday';
+		return `Yesterday ${moment(sentTime).format('HH:mm').toString()}`;
 	} else {
 		if(countHours >= 1){
 			return `${countHours}h ago`;

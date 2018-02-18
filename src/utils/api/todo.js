@@ -53,10 +53,11 @@ export function setTodoStatus(id, status){
 }
 
 export function updateTodo(id, item) {
+	console.log('updateTodo: id: ', id, '| item: ', item);
 	const CURRENT_USER = getUsernameFromEmail(firebase.auth().currentUser.email);
 
 	let dbTodos = firebase.database().ref('todos').child(id)
-	dbTodos.set(Object.assign({}, item, {updatedBy: CURRENT_USER}, {updatedAt: Date.now()}));
+	dbTodos.update(Object.assign({}, item, {updatedBy: CURRENT_USER}, {updatedAt: Date.now()}));
 }
 
 export function getComments(id = null) {
