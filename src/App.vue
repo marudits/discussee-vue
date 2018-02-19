@@ -100,6 +100,7 @@ export default {
 
   &-content {
     margin-top: 5em;
+    margin-bottom: 5em;
   }
 
   &-footer {
