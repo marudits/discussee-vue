@@ -1,4 +1,4 @@
-# Discussee
+# Discussee - Vue
 https://marudits.github.io/discussee-vue/#/
 
 ### Desc:
