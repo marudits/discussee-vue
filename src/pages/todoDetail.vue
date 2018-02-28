@@ -54,7 +54,7 @@
 					
 					<form class="ui reply form" v-if="!item.isDone">
 						<div class="field">
-							<textarea name="form-text" v-model="form.text" rows="3" v-on:keyup="handleComment()"></textarea>
+							<textarea name="form-text" v-model="form.text" rows="3" v-on:keyup="handleComment()" v-on:blur="stoppedTyping(item.id)"></textarea>
 						</div>
 						<div class="message-error" v-if="validation.text.error">{{ validation.text.message }}</div>
 					    <div class="ui blue labeled submit icon button" v-on:click="addComment()">
@@ -117,8 +117,8 @@
 	    		if(this.validateForm()){
 	    			addComment(this.item.id, this.form.text);
 	    			this.resetForm();
+	    			this.stoppedTyping(this.item.id)
 	    		}
-	    		
 	    	},
 	    	formatIsTypingInfo(){
 	    		let isCurrentUserTyping = this.isTyping.list.filter(x => (x.key === getCurrentUsername())).length === 1,
